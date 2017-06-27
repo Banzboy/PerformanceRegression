@@ -1,0 +1,47 @@
+<html>
+
+<head>
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        window.onload = function () {
+
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    message: 'Hello Vue!'
+                }
+            })
+
+        }
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav>
+
+        </nav>
+    </header>
+
+    <section>
+
+        <div id="app">
+            {{ message }}
+        </div>
+
+        <article>
+            <header>
+                <h2>First Test</h2>
+            </header>
+        </article>
+
+        <article>
+            <header>
+                <h2>Second Test</h2>
+            </header>
+        </article>
+
+    </section>
+</body>
+
+</html>
