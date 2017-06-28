@@ -8,8 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Banzboy/PerformanceRegression"
+    "url": "git://github.com/Banzboy/Pharos"
   },
   "author": "Bob Haring",
-  "license": "MIT"
+  "license": "MIT",
+  "bin": {
+    "audit": "./index.js"
+  },
+  "dependencies": {
+    "commander": "^2.10.0",
+    "lighthouse": "^2.1.0"
+  }
 }
