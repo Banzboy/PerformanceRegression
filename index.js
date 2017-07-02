@@ -16,8 +16,9 @@
 
 /// Load modules
 var program = require('commander');
-const exec = require('child_process').exec;
 const fs = require('fs');
+const lighthouse = require('lighthouse');
+const chromeLauncher = require('lighthouse/chrome-launcher');
 
 program
     .option('-u, --url <url>', 'The url to audit')
@@ -27,25 +28,56 @@ program
 if (program.url) console.log("The following url will be audited" + program.url);
 if (program.site) console.log("The following site will be audited" + program.site);
 
-// call lighthouse command and print json results to new directory after every run
-var lighthouseConfig = "";
+function launchChromeAndRunLighthouse(url, flags = {}, config = null) {
+    return chromeLauncher.launch().then(chrome => {
+        flags.port = chrome.port;
+        return lighthouse(url, flags, config).then(results =>
+            chrome.kill().then(() => results));
+    });
+}
 
-// if output json?
-lighthouseConfig = " --output=json";
+const flags = { output: 'json' };
 
-// Create new directory for result, TODO: automatically add site specific folders before the date folder (base the folder name on the url or site name)
-var resultPath = "./json_results/" + Date.now() + "/";
-fs.mkdirSync(resultPath);
-lighthouseConfig += " --output-path=" + resultPath + "report.json";
+// Usage:
+launchChromeAndRunLighthouse(program.url, flags).then(results => {
+    // Use results!
 
-var cmd = 'lighthouse ' + program.url + lighthouseConfig;
+    // TODO: Read template values to run audits per page on a site.
 
-console.log("Running command for lighthouse: " + cmd);
+    // This solution is disgusting make it to one regex!!!
+    var domainName = program.url.replace(/(http(s?))\:\/\//, "").replace(/(\/)/, "").replace(/\./g, "_");
 
-exec(cmd, function (error, stdout, stderr) {
-    // if error undo creating new stuff
+    var resultPath = "./json_results/" + domainName;
 
-    console.log(error);
-    console.log(stdout);
-    console.log(stderr);
+    ensureExists(resultPath, 0744, function (e) {
+        if (e) {
+            console.log("Existing site directory found.");
+        }
+        else {
+            fs.mkdir(resultPath, function (err) {
+                if (err) {
+                    console.log("Directory not found.")
+                } else {
+                    fs.writeFile(resultPath + "/" + domainName + "_" + Date.now() + '.json', results, function (e) {
+                        if (e) {
+                            return console.log(e);
+                        }
+                    });
+                }
+            });
+        }
+    })
 });
+
+function ensureExists(path, mask, cb) {
+    if (typeof mask == 'function') { // allow the `mask` parameter to be optional
+        cb = mask;
+        mask = 0777;
+    }
+    fs.mkdir(path, mask, function (err) {
+        if (err) {
+            if (err.code == 'EEXIST') cb(null); // ignore the error if the folder already exists
+            else cb(err); // something else went wrong
+        } else cb(null); // successfully created folder
+    });
+}

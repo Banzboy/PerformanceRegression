@@ -1,0 +1,13 @@
+{
+    "sitename": "NCOI",
+    "page": [
+        {
+            "pagename": "Home",
+            "path": "/"
+        },
+        {
+            "pagename": "404",
+            "path": "/fdsafasdfasfasf"
+        }
+    ]
+}
