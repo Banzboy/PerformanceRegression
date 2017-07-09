@@ -17,6 +17,9 @@
   },
   "dependencies": {
     "commander": "^2.10.0",
-    "lighthouse": "^2.1.0"
+    "fs": "0.0.1-security",
+    "lighthouse": "^2.1.0",
+    "lodash": "^4.17.4",
+    "mkdirp": "^0.5.1"
   }
 }
